@@ -1,0 +1,19 @@
+{
+  "name": "bus_reservation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.0.0",
+    "bootstrap": "^5.3.7",
+    "jquery": "^3.7.1",
+    "select2": "^4.1.0-rc.0",
+    "xregexp": "^5.1.2"
+  }
+}

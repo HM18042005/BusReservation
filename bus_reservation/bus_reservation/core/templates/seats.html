@@ -1,0 +1,275 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Select Seats - Bus Reservation</title>
+	<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+	<link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+	<link rel="stylesheet" href="{% static 'css/main.css' %}">
+	<style>
+    	.seat {
+        	width: 40px;
+        	height: 40px;
+        	margin: 5px;
+        	text-align: center;
+        	line-height: 40px;
+        	border: 1px solid #ccc;
+        	border-radius: 5px;
+        	background-color: #f8f9fa;
+        	cursor: pointer;
+    	}
+
+    	.seat.selected {
+        	background-color: #198754;
+        	color: #fff;
+    	}
+
+    	.row-seats {
+        	display: flex;
+        	justify-content: space-between;
+        	margin-bottom: 15px;
+    	}
+
+    	.aisle {
+        	width: 20px;
+    	}
+
+    	.last-row {
+        	display: flex;
+        	justify-content: center;
+    	}
+
+    	.seat-layout {
+        	padding: 20px;
+        	background: #fff;
+        	border-radius: 8px;
+        	box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    	}
+    	.seat-row {
+        	display: flex;
+        	justify-content: center;
+        	margin-bottom: 10px;
+    	}
+    	.seat {
+        	width: 45px;
+        	height: 45px;
+        	margin: 5px;
+        	display: flex;
+        	align-items: center;
+        	justify-content: center;
+        	border: 2px solid #ddd;
+        	border-radius: 5px;
+        	cursor: pointer;
+        	font-size: 12px;
+        	transition: all 0.3s;
+    	}
+    	.seat.available {
+        	background-color: #fff;
+        	color: #333;
+    	}
+    	.seat.selected {
+        	background-color: #28a745;
+        	border-color: #28a745;
+        	color: #fff;
+    	}
+    	.seat.booked {
+        	background-color: #dc3545;
+        	border-color: #dc3545;
+        	color: #fff;
+        	cursor: not-allowed;
+    	}
+    	.seat.blocked {
+        	background-color: #6c757d;
+        	border-color: #6c757d;
+        	color: #fff;
+        	cursor: not-allowed;
+    	}
+    	.seat:hover:not(.booked):not(.blocked) {
+        	transform: scale(1.1);
+    	}
+    	.seat-type {
+        	display: inline-block;
+        	margin: 10px;
+    	}
+    	.seat-type .indicator {
+        	display: inline-block;
+        	width: 20px;
+        	height: 20px;
+        	margin-right: 5px;
+        	vertical-align: middle;
+        	border-radius: 3px;
+    	}
+    	.steering {
+        	font-size: 24px;
+        	margin: 20px 0;
+    	}
+	</style>
+</head>
+<body>
+	<header id="header">
+    	<div class="container main-menu">
+        	<div class="row align-items-center justify-content-between d-flex">
+            	<div id="logo">
+                	<a href="{% url 'home' %}"><h3><b>Bus Booking</b></h3></a>
+            	</div>
+            	<nav id="nav-menu-container">
+                	<ul class="nav-menu">
+                    	<li><a href="{% url 'home' %}">Home</a></li>
+                    	<li><a href="{% url 'search_buses' %}">Search Buses</a></li>
+                    	<li><a href="{% url 'dashboard' %}">My Bookings</a></li>
+                    	<li><a href="{% url 'logout' %}">Logout</a></li>
+                	</ul>
+            	</nav>             
+        	</div>
+    	</div>
+	</header>
+
+	<section class="banner-area relative" style="min-height: 200px;">
+    	<div class="overlay overlay-bg"></div>
+    	<div class="container">
+        	<div class="row d-flex align-items-center justify-content-center">
+            	<div class="about-content col-lg-12">
+                	<h1 class="text-white">Select Your Seats</h1>
+                	<p class="text-white">{{ bus.bus_number }} - {{ bus.origin_city }} to {{ bus.destination_city }}</p>
+            	</div>
+        	</div>
+    	</div>
+	</section>
+
+	<section class="section-gap">
+    	<div class="container">
+        	<div class="row">
+            	<div class="col-lg-8">
+                	<div class="card">
+                    	<div class="card-header bg-primary text-white">
+                        	<h5 class="mb-0">Seat Layout</h5>
+                    	</div>
+                    	<div class="card-body">
+                        	<div class="text-center steering">
+                            	<i class="fa fa-steering-wheel"></i> Driver
+                        	</div>
+                        	<div class="seat-layout">
+                            	{% for row in seat_layout %}
+                            	<div class="seat-row">
+                                	{% for seat in row %}
+                                    	{% if seat %}
+                                    	<div class="seat {{ seat.status }}" 
+                                             data-seat-id="{{ seat.seat_id }}"
+                                             data-seat-number="{{ seat.seat_number }}"
+                                             data-seat-type="{{ seat.seat_type }}">
+                                        	{{ seat.seat_number }}
+                                    	</div>
+                                    	{% else %}
+                                    	<div style="width: 45px; height: 45px; margin: 5px;"></div>
+                                    	{% endif %}
+                                	{% endfor %}
+                            	</div>
+                            	{% endfor %}
+                        	</div>
+                    	</div>
+                	</div>
+            	</div>
+            	<div class="col-lg-4">
+                	<div class="card">
+                    	<div class="card-header bg-primary text-white">
+                        	<h5 class="mb-0">Selected Seats</h5>
+                    	</div>
+                    	<div class="card-body">
+                        	<div class="seat-types mb-4">
+                            	<div class="seat-type">
+                                	<span class="indicator" style="background-color: #fff; border: 2px solid #ddd;"></span>
+                                	Available
+                            	</div>
+                            	<div class="seat-type">
+                                	<span class="indicator" style="background-color: #28a745;"></span>
+                                	Selected
+                            	</div>
+                            	<div class="seat-type">
+                                	<span class="indicator" style="background-color: #dc3545;"></span>
+                                	Booked
+                            	</div>
+                        	</div>
+                         
+                         <form id="booking-form" method="post" action="{% url 'book_ticket' bus.bus_id %}">
+                             {% csrf_token %}
+                             <input type="hidden" name="travel_date" value="{{ travel_date }}">
+                             <input type="hidden" name="selected_seats" id="selected-seats">
+                             
+                             <div class="selected-seats-list mb-3">
+                                	<p>No seats selected</p>
+                             </div>
+                             
+                             <div class="fare-details mb-3">
+                                	<p>Fare per seat: ₹{{ bus.fare }}</p>
+                                	<h5>Total Amount: ₹<span id="total-amount">0</span></h5>
+                             </div>
+                             
+                             <button type="submit" class="btn btn-primary btn-block" disabled>
+                                 Proceed to Passenger Details
+                             </button>
+                         </form>
+                    	</div>
+                	</div>
+            	</div>
+        	</div>
+    	</div>
+	</section>
+
+	<script>
+    	document.addEventListener('DOMContentLoaded', function() {
+        	const maxSeats = parseInt("{{ passengers }}");
+        	const farePerSeat = parseFloat("{{ bus.fare }}");
+        	let selectedSeats = [];
+         
+        	function updateSelectedSeats() {
+            	const list = document.querySelector('.selected-seats-list');
+            	const submitBtn = document.querySelector('button[type="submit"]');
+            	const totalAmount = document.getElementById('total-amount');
+            	const selectedSeatsInput = document.getElementById('selected-seats');
+             
+            	if (selectedSeats.length > 0) {
+                	list.innerHTML = selectedSeats.map(seat => `
+                    	<div class="selected-seat">
+                        	Seat ${seat.number} (${seat.type})
+                    	</div>
+                	`).join('');
+                 
+                	totalAmount.textContent = (selectedSeats.length * farePerSeat).toFixed(2);
+                	selectedSeatsInput.value = JSON.stringify(selectedSeats.map(s => s.id));
+                	submitBtn.disabled = selectedSeats.length !== maxSeats;
+            	} else {
+                	list.innerHTML = '<p>No seats selected</p>';
+                	totalAmount.textContent = '0';
+                	selectedSeatsInput.value = '';
+                	submitBtn.disabled = true;
+            	}
+        	}
+         
+        	document.querySelectorAll('.seat.available').forEach(seat => {
+            	seat.addEventListener('click', function() {
+                	const seatId = this.dataset.seatId;
+                	const seatNumber = this.dataset.seatNumber;
+                	const seatType = this.dataset.seatType;
+                 
+                	if (this.classList.contains('selected')) {
+                    	this.classList.remove('selected');
+                    	selectedSeats = selectedSeats.filter(s => s.id !== seatId);
+                	} else if (selectedSeats.length < maxSeats) {
+                    	this.classList.add('selected');
+                    	selectedSeats.push({
+                        	id: seatId,
+                        	number: seatNumber,
+                        	type: seatType
+                    	});
+                	}
+                 
+                	updateSelectedSeats();
+            	});
+        	});
+    	});
+	</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zxx" class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	{% load static %}
+    <link rel="shortcut icon" href="{% static 'img/fav.png' %}">
+    <meta name="author" content="colorlib">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta charset="UTF-8">
+    <title>Travel</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet"> 
+    <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">				
+    <link rel="stylesheet" href="{% static 'css/nice-select.css' %}">							
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">				
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>	
+    <header id="header">
+        <div class="header-top">
+            <div class="container">
+                <div class="row align-items-center">
+                </div>			  					
+            </div>
+        </div>
+        <div class="container main-menu">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div id="logo">
+                    <a href="{% url 'home' %}"><h3><b>Bus Booking</b></h3></a>
+                </div>
+                <nav id="nav-menu-container">
+                    <ul class="nav-menu">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'about' %}">About</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="{% url 'all_reviews' %}">Reviews</a></li>
+                        {% if request.user.is_authenticated %}
+                            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                            <li><a href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">Login</a></li>
+                            <li><a href="{% url 'signup' %}">Signup</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>					      		  
+            </div>
+        </div>
+    </header>
+
+    <section class="about-banner relative">
+        <div class="overlay overlay-bg"></div>
+        <div class="container">				
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="about-content col-lg-12">
+                    <h1 class="text-white">
+                        About Us				
+                    </h1>	
+                    <p class="text-white link-nav"><a href="{% url 'home' %}">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="{% url 'about' %}"> About Us</a></p>
+                </div>	
+            </div>
+        </div>
+    </section>
+
+    <section class="about-info-area section-gap">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 info-left">
+                    <img class="img-fluid" src="{% static 'img/about-img.jpg' %}" alt="">
+                </div>
+                <div class="col-lg-6 info-right">
+                    <h6>About Our Company</h6>
+                    <h1>We are the best <br> in the business</h1>
+                    <p>
+                        We provide the best bus booking services in the industry. Our mission is to make travel convenient and affordable for everyone.
+                    </p>
+                </div>
+            </div>
+        </div>	
+    </section>
+
+    <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>			
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>		
+    <script src="{% static 'js/jquery-ui.js' %}"></script>					
+    <script src="{% static 'js/easing.min.js' %}"></script>			
+    <script src="{% static 'js/hoverIntent.js' %}"></script>
+    <script src="{% static 'js/superfish.min.js' %}"></script>	
+    <script src="{% static 'js/jquery.ajaxchimp.min.js' %}"></script>
+    <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>						
+    <script src="{% static 'js/jquery.nice-select.min.js' %}"></script>					
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>							
+    <script src="{% static 'js/mail-script.js' %}"></script>	
+    <script src="{% static 'js/main.js' %}"></script>	
+</body>
+</html>

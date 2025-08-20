@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Buses - Bus Reservation</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+    <header id="header">
+        <div class="header-top">
+            <div class="container">
+                <div class="row align-items-center">
+                </div>                  
+            </div>
+        </div>
+        <div class="container main-menu">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div id="logo">
+                    <a href="{% url 'home' %}"><h3><b>Bus Booking</b></h3></a>
+                </div>
+                <nav id="nav-menu-container">
+                    <ul class="nav-menu">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'about' %}">About</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="{% url 'all_reviews' %}">Reviews</a></li>
+                        {% if request.user.is_authenticated %}
+                            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                            <li><a href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">Login</a></li>
+                            <li><a href="{% url 'signup' %}">Signup</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>             
+            </div>
+        </div>
+    </header>
+
+    <section class="banner-area relative" style="min-height: 300px;">
+        <div class="overlay overlay-bg"></div>
+        <div class="container">
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="about-content col-lg-12">
+                    <h1 class="text-white">
+                        Search Buses
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-gap">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title text-center mb-4">Find Your Bus</h4>
+                            <form method="post" action="{% url 'search_buses' %}">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <label for="id_origin">From</label>
+                                        {{ form.origin }}
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label for="id_destination">To</label>
+                                        {{ form.destination }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <label for="id_travel_date">Travel Date</label>
+                                        {{ form.travel_date }}
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label for="id_passengers">Passengers</label>
+                                        {{ form.passengers }}
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button type="submit" class="btn btn-primary">Search Buses</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bus Search Results -->
+            {% if buses %}
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h3 class="text-center mb-4">Available Buses</h3>
+                    
+                    {% for bus in buses %}
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="card-title">{{ bus.bus_number }} - {{ bus.bus_type }}</h5>
+                                    <div class="route-info mb-3">
+                                        <p class="mb-1">
+                                            <i class="fa fa-map-marker text-primary"></i> 
+                                            {{ bus.origin_city }} → {{ bus.destination_city }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <i class="fa fa-clock-o text-primary"></i>
+                                            {{ bus.departure_time|time:"g:i A" }} - {{ bus.arrival_time|time:"g:i A" }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <i class="fa fa-hourglass-half text-primary"></i>
+                                            Duration: {{ bus.duration }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <a href="{% url 'bus_reviews' bus.bus_id %}" class="text-decoration-none">
+                                                <i class="fa fa-star text-warning"></i> 
+                                                View Customer Reviews
+                                            </a>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <h4 class="text-primary mb-3">₹{{ bus.fare }} <small>/seat</small></h4>
+                                    <p class="mb-3">
+                                        <i class="fa fa-users text-muted"></i>
+                                        {{ bus.total_seats }} seats available
+                                    </p>
+                                    
+                                    <div class="d-flex justify-content-end">
+                                        {% if request.user.is_authenticated %}
+                                        <a href="{% url 'select_seats' bus.bus_id %}?date={{ search_date|date:'Y-m-d' }}&passengers={{ passengers }}" 
+                                           class="btn btn-primary mr-2">Select Seats</a>
+                                        {% else %}
+                                        <a href="{% url 'login' %}" class="btn btn-primary mr-2">Login to Book</a>
+                                        {% endif %}
+                                        <a href="{% url 'bus_reviews' bus.bus_id %}" class="btn btn-outline-warning">
+                                            <i class="fa fa-star"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% elif buses is not None %}
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <h4>No buses found for this route</h4>
+                        <p>Try searching for a different date or route</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+        </div>
+    </section>
+
+    <footer class="footer-area section-gap">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <p class="footer-text">
+                        &copy; 2023 Bus Reservation System. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
+    <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

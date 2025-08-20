@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Bus Reservation</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <header id="header">
+        <div class="header-top">
+            <div class="container">
+                <div class="row align-items-center">
+                </div>                  
+            </div>
+        </div>
+        <div class="container main-menu">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div id="logo">
+                    <a href="{% url 'home' %}"><h3><b>Bus Booking</b></h3></a>
+                </div>
+                <nav id="nav-menu-container">
+                    <ul class="nav-menu">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'search_buses' %}">Search Buses</a></li>
+                        <li><a href="{% url 'dashboard' %}">My Bookings</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
+                </nav>             
+            </div>
+        </div>
+    </header>
+
+    <section class="banner-area relative" style="min-height: 300px;">
+        <div class="overlay overlay-bg"></div>
+        <div class="container">
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="about-content col-lg-12">
+                    <h1 class="text-white">
+                        Payment
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-gap">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Payment Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="booking-info mb-4">
+                                <h6>Booking Information</h6>
+                                <p><strong>PNR Number:</strong> {{ booking.pnr_number }}</p>
+                                <p><strong>Bus:</strong> {{ booking.schedule.bus.bus_number }} - {{ booking.schedule.bus.origin_city }} to {{ booking.schedule.bus.destination_city }}</p>
+                                <p><strong>Travel Date:</strong> {{ booking.schedule.date }}</p>
+                                <p><strong>Departure:</strong> {{ booking.schedule.bus.departure_time }}</p>
+                                <h5 class="mt-3 text-primary">Amount to Pay: ₹{{ booking.total_amount }}</h5>
+                            </div>
+                            
+                            <div class="passenger-details mb-4">
+                                <h6>Passenger Details</h6>
+                                <div class="passenger-list">
+                                    {% for booking_seat in booking.seats.all %}
+                                    <div class="mb-2">
+                                        <strong>{{ forloop.counter }}. {{ booking_seat.passenger_name }}</strong> - Seat {{ booking_seat.seat.seat_number }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <button id="razorpay-button" class="btn btn-primary btn-block">Pay Now with Razorpay</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-area section-gap">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <p class="footer-text">
+                        &copy; 2023 Bus Reservation System. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    
+    <script>
+        document.getElementById('razorpay-button').onclick = function(e) {
+            e.preventDefault();
+            
+            var options = {
+                "key": "{{ razorpay_key_id }}",
+                "amount": "{{ amount_in_paise }}",
+                "currency": "{{ currency }}",
+                "name": "{{ company_name }}",
+                "description": "{{ description }}",
+                "order_id": "{{ razorpay_order_id }}",
+                "handler": function(response) {
+                    // Submit form with Razorpay response
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = "{% url 'payment_callback' %}";
+                    
+                    var csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrfmiddlewaretoken';
+                    csrfInput.value = '{{ csrf_token }}';
+                    form.appendChild(csrfInput);
+                    
+                    var paymentIdInput = document.createElement('input');
+                    paymentIdInput.type = 'hidden';
+                    paymentIdInput.name = 'razorpay_payment_id';
+                    paymentIdInput.value = response.razorpay_payment_id;
+                    form.appendChild(paymentIdInput);
+                    
+                    var orderIdInput = document.createElement('input');
+                    orderIdInput.type = 'hidden';
+                    orderIdInput.name = 'razorpay_order_id';
+                    orderIdInput.value = response.razorpay_order_id;
+                    form.appendChild(orderIdInput);
+                    
+                    var signatureInput = document.createElement('input');
+                    signatureInput.type = 'hidden';
+                    signatureInput.name = 'razorpay_signature';
+                    signatureInput.value = response.razorpay_signature;
+                    form.appendChild(signatureInput);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                },
+                "prefill": {
+                    "name": "{{ user_name }}",
+                    "email": "{{ user_email }}"
+                },
+                "theme": {
+                    "color": "#007bff"
+                }
+            };
+            
+            var rzp = new Razorpay(options);
+            rzp.open();
+        };
+    </script>
+</body>
+</html>

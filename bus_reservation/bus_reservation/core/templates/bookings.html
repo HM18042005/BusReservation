@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passenger Details - Bus Reservation</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+    <header id="header">
+        <div class="header-top">
+            <div class="container">
+                <div class="row align-items-center">
+                </div>                  
+            </div>
+        </div>
+        <div class="container main-menu">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div id="logo">
+                    <a href="{% url 'home' %}"><h3><b>Bus Booking</b></h3></a>
+                </div>
+                <nav id="nav-menu-container">
+                    <ul class="nav-menu">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'search_buses' %}">Search Buses</a></li>
+                        <li><a href="{% url 'dashboard' %}">My Bookings</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
+                </nav>             
+            </div>
+        </div>
+    </header>
+
+    <section class="banner-area relative" style="min-height: 300px;">
+        <div class="overlay overlay-bg"></div>
+        <div class="container">
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="about-content col-lg-12">
+                    <h1 class="text-white">
+                        Enter Passenger Details
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-gap">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Booking Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <h5>{{ booking.schedule.bus.origin_city }} to {{ booking.schedule.bus.destination_city }}</h5>
+                            <p>Bus Number: {{ booking.schedule.bus.bus_number }}</p>
+                            <p>Date: {{ travel_date }}</p>
+                            <p>Departure: {{ booking.schedule.bus.departure_time }}</p>
+                            <p>Arrival: {{ booking.schedule.bus.arrival_time }}</p>
+                            <p>Total Amount: ₹{{ booking.total_amount }}</p>
+                            <div class="mt-3">
+                                <h6>Selected Seats:</h6>
+                                <ul class="list-unstyled">
+                                    {% for seat in seats %}
+                                    <li>Seat {{ seat.seat_number }} ({{ seat.get_seat_type_display }})</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Passenger Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{% url 'update_passenger_details' booking.booking_id %}">
+                                {% csrf_token %}
+                                
+                                {% for seat in seats %}
+                                <div class="passenger-details mb-4">
+                                    <h6>Passenger {{ forloop.counter }} (Seat {{ seat.seat_number }})</h6>
+                                    <div class="row">
+                                        <div class="col-md-6 form-group">
+                                            <label>Name</label>
+                                            <input type="text" name="passenger_name_{{ forloop.counter0 }}" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Age</label>
+                                            <input type="number" name="passenger_age_{{ forloop.counter0 }}" class="form-control" min="1" max="120" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Gender</label>
+                                            <select name="passenger_gender_{{ forloop.counter0 }}" class="form-control" required>
+                                                <option value="">Select</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                        <input type="hidden" name="seat_id_{{ forloop.counter0 }}" value="{{ seat.seat_id }}">
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-primary">Proceed to Payment</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

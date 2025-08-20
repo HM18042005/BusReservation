@@ -1,0 +1,76 @@
+{% extends 'bus_management/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="banner-area relative" style="min-height: 200px;">
+    <div class="overlay overlay-bg"></div>
+    <div class="container">
+        <div class="row d-flex align-items-center justify-content-center">
+            <div class="about-content col-lg-12">
+                <h1 class="text-black">Manage Users</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-gap">
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Full Name</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                <td>{{ user.phone }}</td>
+                                <td>
+                                    {% if user.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="post" action="{% url 'bus_management:manage_users' %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user_id" value="{{ user.user_id }}">
+                                        <input type="hidden" name="action" value="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
+                                        <button type="submit" class="btn btn-sm {% if user.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                                            {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No users found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ bus.origin_city }} to {{ bus.destination_city }} - Reviews</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <style>
+        .star-rating {
+            color: #FFD700;
+            font-size: 1.2rem;
+        }
+        .big-star-rating {
+            color: #FFD700;
+            font-size: 2.5rem;
+        }
+        .review-card {
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+        }
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .review-date {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .review-text {
+            font-style: italic;
+            line-height: 1.6;
+        }
+        .bus-details {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 20px;
+        }
+        .rating-breakdown .progress {
+            height: 10px;
+            margin-bottom: 10px;
+        }
+        .rating-count {
+            width: 30px;
+            text-align: center;
+        }
+        .booking-buttons {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <div class="header-top">
+            <div class="container">
+                <div class="row align-items-center">
+                </div>
+            </div>
+        </div>
+        <div class="container main-menu">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div id="logo">
+                    <a href="{% url 'home' %}"><h3><b>Bus Booking</b></h3></a>
+                </div>
+                <nav id="nav-menu-container">
+                    <ul class="nav-menu">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'about' %}">About</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="{% url 'all_reviews' %}">Reviews</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                            <li><a href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">Login</a></li>
+                            <li><a href="{% url 'signup' %}">Signup</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="banner-area relative" style="min-height: 300px;">
+        <div class="overlay overlay-bg"></div>
+        <div class="container">
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="about-content col-lg-12">
+                    <h1 class="text-white">
+                        {{ bus.origin_city }} to {{ bus.destination_city }} Reviews
+                    </h1>
+                    <p class="text-white">Reviews for {{ bus.bus_type }} bus ({{ bus.bus_number }})</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-gap">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="bus-details mb-4">
+                        <h4>Bus Details</h4>
+                        <hr>
+                        <p><strong>Bus Number:</strong> {{ bus.bus_number }}</p>
+                        <p><strong>Bus Type:</strong> {{ bus.bus_type }}</p>
+                        <p><strong>Route:</strong> {{ bus.origin_city }} to {{ bus.destination_city }}</p>
+                        <p><strong>Departure:</strong> {{ bus.departure_time }}</p>
+                        <p><strong>Arrival:</strong> {{ bus.arrival_time }}</p>
+                        <p><strong>Duration:</strong> {{ bus.duration }}</p>
+                        <p><strong>Fare:</strong> ₹{{ bus.fare }}</p>
+                        
+                        <div class="booking-buttons text-center">
+                            <h5>Interested in this bus?</h5>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'select_seats' bus.bus_id %}?date={{ search_params.travel_date|date:'Y-m-d' }}&passengers={{ search_params.passengers }}" class="btn btn-primary">
+                                    Book This Bus
+                                </a>
+                                <a href="{% url 'home' %}?origin={{ search_params.origin }}&destination={{ search_params.destination }}&travel_date={{ search_params.travel_date|date:'Y-m-d' }}&passengers={{ search_params.passengers }}" class="btn btn-outline-secondary">
+                                    View Other Buses
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4>Overall Rating</h4>
+                            <div class="big-star-rating mb-2">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= avg_rating|add:0.5|floatformat:"0" %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <h3>{{ avg_rating }} / 5</h3>
+                            <p>Based on {{ total_reviews }} review{% if total_reviews != 1 %}s{% endif %}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-8">
+                    <div class="mb-4">
+                        <h4>Customer Reviews</h4>
+                        <hr>
+                    </div>
+
+                    {% if reviews %}
+                        {% for review in reviews %}
+                            <div class="card review-card mb-4">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="card-title">{{ review.user.first_name }} {{ review.user.last_name|first }}.</h5>
+                                        <div class="star-rating">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                    ★
+                                                {% else %}
+                                                    ☆
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <p class="review-text">{{ review.review_text }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <span class="text-muted">Travel Date: {{ review.booking.schedule.date }}</span>
+                                        <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        {% if is_paginated %}
+                            <div class="pagination justify-content-center mt-4">
+                                <ul class="pagination">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1">&laquo; First</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                        </li>
+                                    {% endif %}
+
+                                    {% for num in page_obj.paginator.page_range %}
+                                        {% if page_obj.number == num %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ num }}</span>
+                                            </li>
+                                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            No reviews yet for this bus. Be the first to review!
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-area section-gap">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <p class="footer-text">
+                        &copy; 2024 Bus Reservation System. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
+    <script src="{% static 'js/easing.min.js' %}"></script>
+    <script src="{% static 'js/hoverIntent.js' %}"></script>
+    <script src="{% static 'js/superfish.min.js' %}"></script>
+    <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'js/jquery.nice-select.min.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html> 

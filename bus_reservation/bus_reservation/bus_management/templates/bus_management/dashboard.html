@@ -1,0 +1,105 @@
+{% extends 'bus_management/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white mb-4">
+            <div class="card-body">
+                <h5>Total Buses</h5>
+                <h2>{{ total_buses }}</h2>
+                <a href="{% url 'bus_management:manage_buses' %}" class="text-white">View Details →</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white mb-4">
+            <div class="card-body">
+                <h5>Total Bookings</h5>
+                <h2>{{ total_bookings }}</h2>
+                <a href="{% url 'bus_management:manage_bookings' %}" class="text-white">View Details →</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white mb-4">
+            <div class="card-body">
+                <h5>Total Users</h5>
+                <h2>{{ total_users }}</h2>
+                <a href="{% url 'bus_management:manage_users' %}" class="text-white">View Details →</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white mb-4">
+            <div class="card-body">
+                <h5>Total Reviews</h5>
+                <h2>{{ total_reviews }}</h2>
+                <a href="{% url 'bus_management:manage_reviews' %}" class="text-white">View Details →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Recent Bookings</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>PNR</th>
+                                <th>User</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in recent_bookings %}
+                            <tr>
+                                <td>{{ booking.pnr_number }}</td>
+                                <td>{{ booking.user.username }}</td>
+                                <td>{{ booking.booking_date }}</td>
+                                <td>{{ booking.get_status_display }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Recent Reviews</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Rating</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for review in recent_reviews %}
+                            <tr>
+                                <td>{{ review.user.username }}</td>
+                                <td>{{ review.rating }}/5</td>
+                                <td>{{ review.created_at }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

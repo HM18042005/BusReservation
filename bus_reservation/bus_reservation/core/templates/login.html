@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Sign Up</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+    <div class="container" id="loginBox" {% if signup_form %}style="display: none;"{% endif %}>
+        <h2>Login</h2>
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {{ form.as_p }}
+            <button type="submit">Login</button>
+            <p class="toggle" onclick="toggleForm()">Don't have an account? Sign Up</p>
+        </form>
+    </div>
+
+    <div class="container" id="signupBox" {% if not signup_form %}style="display: none;"{% endif %}>
+        <h2>Sign Up</h2>
+        <form method="post" action="{% url 'signup' %}">
+            {% csrf_token %}
+            {{ signup_form.as_p }}
+            <button type="submit">Sign Up</button>
+            <p class="toggle" onclick="toggleForm()">Already have an account? Login</p>
+        </form>
+    </div>
+
+    <script>
+        function toggleForm() {
+            document.getElementById('loginBox').style.display = 
+                document.getElementById('loginBox').style.display === 'none' ? 'block' : 'none';
+            document.getElementById('signupBox').style.display = 
+                document.getElementById('signupBox').style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>

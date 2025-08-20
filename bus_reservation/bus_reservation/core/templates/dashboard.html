@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Bus Reservation</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+    <header id="header">
+        <div class="header-top">
+            <div class="container">
+                <div class="row align-items-center">
+                </div>
+            </div>
+        </div>
+        <div class="container main-menu">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div id="logo">
+                    <a href="{% url 'home' %}"><h3><b>Bus Booking</b></h3></a>
+                </div>
+                <nav id="nav-menu-container">
+                    <ul class="nav-menu">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'about' %}">About</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="{% url 'all_reviews' %}">Reviews</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                            <li><a href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">Login</a></li>
+                            <li><a href="{% url 'signup' %}">Signup</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="banner-area relative" style="min-height: 300px;">
+        <div class="overlay overlay-bg"></div>
+        <div class="container">
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="about-content col-lg-12">
+                    <h1 class="text-white">
+                        My Dashboard
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-gap">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">User Profile</h5>
+                            <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Phone:</strong> {{ user.phone }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Bookings</h5>
+                                    <h2>{{ total_bookings }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Active Bookings</h5>
+                                    <h2>{{ active_bookings }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Cancelled Bookings</h5>
+                                    <h2>{{ cancelled_bookings }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Booking History</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if bookings %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>PNR Number</th>
+                                                <th>Bus</th>
+                                                <th>Travel Date</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for booking in bookings %}
+                                            <tr>
+                                                <td>{{ booking.pnr_number }}</td>
+                                                <td>{{ booking.schedule.bus.bus_number }} - {{ booking.schedule.bus.origin_city }} to {{ booking.schedule.bus.destination_city }}</td>
+                                                <td>{{ booking.schedule.date|date:"d M Y" }}</td>
+                                                <td>₹{{ booking.total_amount }}</td>
+                                                <td>
+                                                    <span class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                        {{ booking.status|title }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {% if booking.status == 'confirmed' %}
+                                                        <a href="{% url 'review' booking.booking_id %}" class="btn btn-sm btn-primary">Review</a>
+                                                    {% endif %}
+                                                    <a href="{% url 'confirmation' booking.booking_id %}" class="btn btn-sm btn-info">Details</a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-center">No bookings found.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-area section-gap">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <p class="footer-text">
+                        &copy; 2024 Bus Reservation System. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
+    <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

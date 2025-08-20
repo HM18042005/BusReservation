@@ -1,0 +1,7 @@
+django
+django-bootstrap5
+django-widget-tweaks
+razorpay
+pytz
+sqlparse
+setuptools<81

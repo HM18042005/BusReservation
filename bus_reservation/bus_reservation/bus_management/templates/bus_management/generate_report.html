@@ -1,0 +1,89 @@
+{% extends 'bus_management/base.html' %}
+
+{% block content %}
+<section class="banner-area relative" style="min-height: 200px;">
+    <div class="overlay overlay-bg"></div>
+    <div class="container">
+        <div class="row d-flex align-items-center justify-content-center">
+            <div class="about-content col-lg-12">
+                <h1 class="text-black">Generate Reports</h1>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Generate Reports</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="report_type">Report Type</label>
+                                    <select name="report_type" id="report_type" class="form-control" required>
+                                        <option value="">Select Report Type</option>
+                                        <option value="booking">Booking Report</option>
+                                        <option value="revenue">Revenue Report</option>
+                                        <option value="user">User Statistics</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="start_date">Start Date</label>
+                                    <input type="date" name="start_date" id="start_date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="end_date">End Date</label>
+                                    <input type="date" name="end_date" id="end_date" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Generate Report</button>
+                    </form>
+
+                    {% if report_data %}
+                    <div class="mt-4">
+                        <h4>Report Results</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        {% for header in report_headers %}
+                                        <th>{{ header }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in report_data %}
+                                    <tr>
+                                        {% for cell in row %}
+                                        <td>{{ cell }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if report %}
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                Report generated on: {{ report.generated_at|date:"F j, Y, g:i a" }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
