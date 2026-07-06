@@ -32,3 +32,4 @@ Thumbs.db
 
 # Secrets (example)
 .env
+node_modules
